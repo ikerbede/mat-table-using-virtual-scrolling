@@ -1,4 +1,6 @@
+import { CdkScrollable, ScrollDispatcher } from "@angular/cdk/overlay";
 import { Component, OnInit } from "@angular/core";
+import { filter, map } from "rxjs/operators";
 import { TableDataSource } from "./table.models";
 
 @Component({
@@ -10,7 +12,18 @@ export class TableComponent implements OnInit {
   displayedColumns = ["position", "name", "weight"];
   dataSource = new TableDataSource();
 
-  constructor() {}
+  constructor(public scrollDispatcher: ScrollDispatcher) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.scrollDispatcher
+      .scrolled()
+      .pipe(
+        map(
+          (scrollable: CdkScrollable) =>
+            scrollable.getElementRef().nativeElement.scrollTop
+        ),
+        filter(scrollTop => !!scrollTop)
+      )
+      .subscribe(scrollTop => this.dataSource.updateScrollTop(scrollTop));
+  }
 }
