@@ -1,5 +1,6 @@
-import { DataSource } from "@angular/cdk/collections";
-import { BehaviorSubject, Observable, of } from "rxjs";
+import { CollectionViewer, DataSource } from "@angular/cdk/collections";
+import { BehaviorSubject, Observable, of, Subscription } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
 
 export interface Element {
   position: number;
@@ -10,11 +11,19 @@ export interface Element {
 export class TableDataSource extends DataSource<Element> {
   data = new BehaviorSubject<Element[]>(this._getElements(1000));
 
-  connect(): Observable<Element[]> {
-    return this.data;
+  private _subscriptions: Subscription[] = [];
+
+  connect(collectionViewer: CollectionViewer): Observable<Element[]> {
+    return collectionViewer.viewChange.pipe(
+      switchMap(range =>
+        this.data.pipe(map(elts => elts.slice(range.start, range.end)))
+      )
+    );
   }
 
-  disconnect() {}
+  disconnect() {
+    this._subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
 
   private _getElements(size: number): Element[] {
     let elements = [];
