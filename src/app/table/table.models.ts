@@ -1,6 +1,5 @@
-import { DataSource } from "@angular/cdk/collections";
-import { BehaviorSubject, Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { MatTableDataSource } from "@angular/material/table";
+import { BehaviorSubject } from "rxjs";
 
 export interface PElement {
   position: number;
@@ -8,24 +7,21 @@ export interface PElement {
   weight: number;
 }
 
-export class TableDataSource extends DataSource<PElement> {
-  data: PElement[];
+export class TableDataSource<T> extends MatTableDataSource<T> {
+  BUFFER_SIZE = 5;
+  RANGE_SIZE = 30;
 
-  private _scrollTop = new BehaviorSubject<number>(0);
+  private _dataStream = new BehaviorSubject<T[]>([]);
 
-  connect(): Observable<PElement[]> {
-    return this._scrollTop.pipe(
-      map(value => {
-        const start = Math.max(0, value - 5);
-        const end = Math.min(this.data.length, value + 30);
-        return this.data.slice(start, end);
-      })
-    );
+  connect(): BehaviorSubject<T[]> {
+    return this._dataStream;
   }
 
   disconnect() {}
 
   updateScrollTop(value: number) {
-    this._scrollTop.next(value);
+    const start = Math.max(0, value - this.BUFFER_SIZE);
+    const end = Math.min(this.data.length, value + this.RANGE_SIZE);
+    this._dataStream.next(this.data.slice(start, end));
   }
 }
