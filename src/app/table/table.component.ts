@@ -1,5 +1,5 @@
 import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
 import { PElement, TableDataSource } from "./table.models";
 
 @Component({
@@ -7,7 +7,7 @@ import { PElement, TableDataSource } from "./table.models";
   templateUrl: "./table.component.html",
   styleUrls: ["./table.component.css"]
 })
-export class TableComponent implements OnInit {
+export class TableComponent implements OnInit, AfterViewInit {
   displayedColumns = ["position", "name", "weight"];
   data: PElement[] = this._getElements(1000);
   dataSource = new TableDataSource();
