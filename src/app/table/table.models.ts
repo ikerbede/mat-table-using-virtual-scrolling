@@ -1,5 +1,5 @@
 import { DataSource } from "@angular/cdk/collections";
-import { BehaviorSubject, Observable, Subscription } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
 export interface PElement {
@@ -12,7 +12,6 @@ export class TableDataSource extends DataSource<PElement> {
   data: PElement[];
 
   private _scrollTop = new BehaviorSubject<number>(0);
-  private _subscriptions: Subscription[] = [];
 
   connect(): Observable<PElement[]> {
     return this._scrollTop.pipe(
@@ -24,9 +23,7 @@ export class TableDataSource extends DataSource<PElement> {
     );
   }
 
-  disconnect() {
-    this._subscriptions.forEach(subscription => subscription.unsubscribe());
-  }
+  disconnect() {}
 
   updateScrollTop(value: number) {
     this._scrollTop.next(value);
