@@ -1,4 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { PElement, TableDataSource } from "./table.models";
 
 @Component({
@@ -10,11 +11,21 @@ export class TableComponent implements OnInit {
   displayedColumns = ["position", "name", "weight"];
   data: PElement[] = this._getElements(1000);
   dataSource = new TableDataSource();
+  headerTop = "0px";
+
+  @ViewChild(CdkVirtualScrollViewport) viewPort: CdkVirtualScrollViewport;
 
   constructor() {}
 
   ngOnInit() {
     this.dataSource.data = this.data;
+  }
+
+  ngAfterViewInit(): void {
+    if (!!this.viewPort) {
+      this.viewPort["_scrollStrategy"].onRenderedOffsetChanged = () =>
+        (this.headerTop = `-${this.viewPort.getOffsetToRenderedContentStart()}px`);
+    }
   }
 
   onScrollIndexChange(index: number) {
