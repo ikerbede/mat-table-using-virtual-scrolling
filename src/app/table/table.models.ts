@@ -19,6 +19,11 @@ export class TableDataSource<T> extends MatTableDataSource<T> {
 
   disconnect() {}
 
+  updateSort() {
+    this.data = this.sortData(this.data, this.sort);
+    this._dataStream.next(this.data.slice(0, this.RANGE_SIZE));
+  }
+
   updateScrollTop(value: number) {
     const start = Math.max(0, value - this.BUFFER_SIZE);
     const end = Math.min(this.data.length, value + this.RANGE_SIZE);

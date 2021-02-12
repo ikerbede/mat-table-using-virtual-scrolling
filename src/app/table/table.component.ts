@@ -1,5 +1,6 @@
 import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
+import { MatSort } from "@angular/material/sort";
 import { PElement, TableDataSource } from "./table.models";
 
 @Component({
@@ -14,6 +15,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   headerTop = "0px";
 
   @ViewChild(CdkVirtualScrollViewport) viewPort: CdkVirtualScrollViewport;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor() {}
 
@@ -22,6 +24,14 @@ export class TableComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    // Sort
+    this.dataSource.sort = this.sort;
+    this.sort.sortChange.subscribe(() => {
+      this.viewPort.scrollToIndex(0);
+      this.dataSource.updateSort();
+    });
+
+    // Scroll
     if (!!this.viewPort) {
       this.viewPort["_scrollStrategy"].onRenderedOffsetChanged = () =>
         (this.headerTop = `-${this.viewPort.getOffsetToRenderedContentStart()}px`);
